@@ -99,7 +99,13 @@ func targetPodsNum(namespace string, selector map[string]string) int {
 		log.Errorln(err)
 		return 0
 	} else {
-		return len(out.Items)
+		ret := 0
+		for _, p := range out.Items {
+			if p.Status.Phase == core_v1.PodRunning {
+				ret++
+			}
+		}
+		return ret
 	}
 }
 
@@ -108,9 +114,9 @@ func main() {
 	go func() {
 		for {
 			o, e := getServiceList()
-      if e != nil {
-        log.Errorln(e)
-      }
+			if e != nil {
+				log.Errorln(e)
+			}
 			for _, s := range o {
 				if len(s.Spec.Selector) != 0 {
 					p := targetPodsNum(s.ObjectMeta.Namespace, s.Spec.Selector)
