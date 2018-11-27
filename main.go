@@ -107,7 +107,10 @@ func main() {
 	flag.Parse()
 	go func() {
 		for {
-			o, _ := getServiceList()
+			o, e := getServiceList()
+      if e != nil {
+        log.Errorln(e)
+      }
 			for _, s := range o {
 				if len(s.Spec.Selector) != 0 {
 					p := targetPodsNum(s.ObjectMeta.Namespace, s.Spec.Selector)
